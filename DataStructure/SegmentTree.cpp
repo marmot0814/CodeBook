@@ -29,10 +29,12 @@ struct SegmentTree{
 	Node* pull(Node *u, Node *l = NULL, Node *r = NULL){
 		if (!l) l = u->l;
 		if (!r) r = u->r;
+		push(l); push(r);
 		// pull function
 		return u;
 	}
 	void push(Node *u){
+		if (!u) return ;
 		// push function
 	}
 	void modify(int L, int R, int v, Node *u = NULL){
