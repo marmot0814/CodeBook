@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdlib>
 using namespace std;
+const int MAXN = 2e5 + 5;
 typedef long long LL;
 struct Treap{
 	struct Node{
@@ -47,7 +48,10 @@ struct Treap{
 				rev = false;
 			}
 		}
-	}*root;
+	}*root, _mem[MAXN], *ptr;
+	Treap(){
+		ptr = _mem;
+	}
 	#define PNN pair<Node*, Node*>
 	#define MP make_pair
 	#define F first
@@ -84,16 +88,7 @@ struct Treap{
 	void insert(LL v, int k = -1){
 		if (!~k) k = root->size() + 1;
 		PNN tmp = split(root, k);
-		root = merge(merge(tmp.F, new Node(v)), tmp.S);
-	}
-	void remove(Node *u){
-		if (!u) return ;
-		remove(u->l);
-		remove(u->r);
-		delete u;
-	}
-	~Treap(){
-		remove(root);
+		root = merge(merge(tmp.F, new (ptr++)Node(v)), tmp.S);
 	}
 	void addValue(int x, int y, LL v){
 		PNN tmp_1 = split(root, y);
@@ -105,7 +100,6 @@ struct Treap{
 		PNN tmp_1 = split(root, k);
 		PNN tmp_2 = split(tmp_1.F, k-1);
 		root = merge(tmp_2.F, tmp_1.S);
-		delete tmp_2.S;
 	}
 	int minValue(int x, int y){
 		PNN tmp_1 = split(root, y);

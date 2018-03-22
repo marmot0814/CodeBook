@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
+const int MAXN = 1000;
 struct Treap{
 	struct Node{
 		Node *l, *r;
@@ -19,7 +20,10 @@ struct Treap{
 		inline void push(){
 
 		}
-	}*root;
+	}*root, _mem[MAXN], *ptr;
+	Treap(){
+		ptr = _mem;
+	}
 #define PNN pair<Node*, Node*>
 #define MP make_pair
 #define F first
@@ -64,7 +68,7 @@ struct Treap{
 	void insert(int v, int k = -1){
 		if (!~k) k = rank(v);
 		PNN tmp = split(root, k);
-		root = merge(merge(tmp.F, new Node(v)), tmp.S);
+		root = merge(merge(tmp.F, new (ptr++) Node(v)), tmp.S);
 	}
 	void Print(Node *u = NULL){
 		if (!u) u = root;
