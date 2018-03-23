@@ -96,7 +96,7 @@ struct Treap{
 		tmp_2.S->add += v;
 		root = merge(merge(tmp_2.F, tmp_2.S), tmp_1.S);
 	}
-	void Delete(int k){
+	void earse(int k){
 		PNN tmp_1 = split(root, k);
 		PNN tmp_2 = split(tmp_1.F, k-1);
 		root = merge(tmp_2.F, tmp_1.S);
@@ -159,7 +159,7 @@ int main(){
 				break;
 			case 'D':
 				cin >> x;
-				sol->Delete(x);
+				sol->earse(x);
 				break;
 			case 'M':
 				int x, y; cin >> x >> y;
