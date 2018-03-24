@@ -17,6 +17,16 @@ struct ACAutomaton{
 			buildTrie(input[i]);
 		buildAC();
 	}
+	~ACAutomaton(){
+		remove(r);
+		delete o;
+	}
+	void remove(Node *u){
+		if (!u) return ;
+		for (int i = 0 ; i < SIGMA ; i++)
+			remove(u->n[i]);
+		delete u;
+	}
 	inline int idx(char c){
 		// mapping function;
 		return c - 'a';
@@ -59,6 +69,7 @@ struct ACAutomaton{
 		}
 		return ans;
 	}
+	
 };
 int main(){
 
