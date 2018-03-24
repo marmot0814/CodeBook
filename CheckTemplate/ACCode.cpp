@@ -1,76 +1,85 @@
-#include<stdio.h>
-#include<math.h>
-const int MAX=50004*4;
-int tree[MAX];
-void add(int root)
-{
-	tree[root]=tree[2*root]+tree[2*root+1];
-}
-void buildtree(int root,int left,int right)
-{
-	if(left==right)
-	{
-		scanf("%d",&tree[root]);
-		return;
-	}
-	int mid=(left+right)/2;
-	buildtree(root*2,left,mid);
-	buildtree(root*2+1,mid+1,right);
-	add(root);
-}
-void update(int root,int left,int right,int position,int add_num)
-{
-	if(left==right)
-	{
-		tree[root]+=add_num;
-		return;
-	}
-	int mid=(left+right)/2;
-	if(position<=mid)
-		update(root*2,left,mid,position,add_num);
-	else
-		update(root*2+1,mid+1,right,position,add_num);
-	add(root);
-}
-int getsum(int root,int left,int right,int begin,int end)
-{
-	if(left==begin&&right==end)
-		return tree[root];
-	int mid=(left+right)/2,result=0;
-	if(begin>mid)
-		result+=getsum(root*2+1,mid+1,right,begin,end);
-	else if(end<=mid)
-		result+=getsum(root*2,left,mid,begin,end);
-	else
-	{
-		result+=getsum(root*2+1,mid+1,right,mid+1,end);
-		result+=getsum(root*2,left,mid,begin,mid);
-	}
-	return result;
-}
-int main()
-{
-	int t,n;
-    scanf("%d", &t);
-    for(int k=1;k<=t;k++)
-    {
-        scanf("%d", &n);
-		buildtree(1, 1, n);
-        char op[10];
-        int t1, t2;
-        printf("Case %d:\n", k);
-        while(scanf("%s", op))
-        {
-           	if(op[0]=='E')
-				break;
-            scanf("%d %d",&t1,&t2);
-            if(op[0]=='A')
-               	update(1,1,n,t1,t2);
-            else if(op[0]=='S')
-                update(1,1,n,t1,-t2);
-            else            
-               	printf("%d\n",getsum(1,1,n,t1,t2));
-     	}
+#include <bits/stdc++.h>
+using namespace std;
+const int SIGMA = 26;
+const int MAXNODE = 5e5 + 5;
+struct AC{
+    inline int idx(char c){
+        return c - 'a';
     }
-    return 0;
+    struct Node{
+        Node *fail, *next[SIGMA];
+        bool vis;
+        int dp;
+        Node(){
+            memset(next, 0, sizeof(next));
+            dp = 0; fail = NULL;
+            vis = false;
+        }
+    }*root, *ori, *ptr, _mem[MAXNODE];
+    void init(){
+        ptr = _mem;
+        ori = new (ptr++) Node();
+        root = new (ptr++) Node();
+    }
+    void buildTrie(char *s){
+        Node *cur = root;
+        for (int i = 0 ; s[i] ; i++){
+            int c = idx(s[i]);
+            if (cur->next[c] == NULL)
+                cur->next[c] = new (ptr++) Node();
+            cur = cur->next[c];
+        }
+        cur->dp++;
+    }
+    Node* trans(Node *cur, int c){
+        while (cur->next[c] == NULL) cur = cur->fail;
+        return cur->next[c];
+    }
+    void buildAC(){
+        static queue<Node*> q;
+        for (int i = 0 ; i < SIGMA ; i++)
+            ori->next[i] = root;
+        root->fail = ori;
+        q.push(root);
+        while (q.size()){
+            Node *cur = q.front(); q.pop();
+            for (int i = 0 ; i < SIGMA ; i++){
+                if (cur->next[i] == NULL) continue;
+                cur->next[i]->fail = trans(cur->fail, i);
+                q.push(cur->next[i]);
+            }
+        }
+    }
+    int search(char *s){
+        int ans = 0;
+        Node *cur = root;
+        for (int i = 0 ; s[i] ; i++){
+            cur = trans(cur, idx(s[i]));
+            Node *tmp = cur;
+            while (tmp != root && !tmp->vis){
+                ans += tmp->dp;
+                tmp->vis = true;
+                tmp = tmp->fail;
+            }
+        }
+        return ans;
+    }
+};
+AC sol;
+const int MAXLEN = 1e6 + 5;
+char buf[MAXLEN];
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    int t; cin >> t; while (t--){
+        sol.init();
+        int n; cin >> n;
+        for (int i = 0 ; i < n ; i++){
+            cin >> buf;
+            sol.buildTrie(buf);
+        }
+        sol.buildAC();
+        cin >> buf;
+        cout << sol.search(buf) << '\n';
+    }
 }
