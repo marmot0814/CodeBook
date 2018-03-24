@@ -11,18 +11,19 @@ struct Treap{
 			sz = 1;
 			l = r = NULL;
 		}
-		inline int size(){
-			return this ? sz : 0;
-		}
-		inline void pull(){
-			sz = 1 + l->size() + r->size();
-		}	
-		inline void push(){
-
-		}
 	}*root, _mem[MAXN], *ptr;
 	Treap(){
 		ptr = _mem;
+	}
+	inline int size(Node *u){
+		return u ? u->sz : 0;
+	}
+	inline void pull(Node *u){
+		u->sz = 1 + size(u->l) + size(u->r);
+
+	}
+	inline void push(Node *u){
+
 	}
 #define PNN pair<Node*, Node*>
 #define MP make_pair
@@ -30,30 +31,30 @@ struct Treap{
 #define S second
 	PNN split(Node *T, int x){
 		if (!T) return MP((Node*)NULL, (Node*)NULL);
-		T->push();
-		if (T->l->size() < x){
-			PNN tmp = split(T->r, x - T->l->size() - 1);
+		push(T);
+		if (size(T->l) < x){
+			PNN tmp = split(T->r, x - size(T->l) - 1);
 			T->r =tmp.F;
-			T->pull();
+			pull(T);
 			return MP(T, tmp.S);
 		}else{
 			PNN tmp = split(T->l, x);
 			T->l = tmp.S;
-			T->pull();
+			pull(T);
 			return MP(tmp.F, T);
 		}
 	}
 	Node* merge(Node *T1, Node *T2){
 		if (!T1 || !T2) return T1 ? T1 : T2;
 		if (T1->pri < T2->pri){
-			T2->push();
+			push(T2);
 			T2->l = merge(T1, T2->l);
-			T2->pull();
+			pull(T2);
 			return T2;
 		}else{
-			T1->push();
+			push(T1);
 			T1->r = merge(T1->r, T2);
-			T1->pull();
+			pull(T1);
 			return T1;
 		}
 	}
@@ -63,7 +64,7 @@ struct Treap{
 		if (v < u->v)
 			return rank(v, u->l, false);
 		else
-			return u->l->size() + rank(v, u->r, false) + 1;
+			return size(u->l) + rank(v, u->r, false) + 1;
 	}
 	void insert(int v, int k = -1){
 		if (!~k) k = rank(v);
