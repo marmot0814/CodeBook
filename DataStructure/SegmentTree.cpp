@@ -1,35 +1,50 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int MAXN  = 1000 + 5;
+const int MAXN = 5e4 + 5;;
 const int lgN = __lg(MAXN) + 5;
+const int MAXK = 100;
 struct SegmentTree{
 	struct Node{
 		int L, R;
-		Node *l ,*r;
+		Node *l, *r;
 		// data
 		// tag
-		int len() { return R - L; }
-		int mid() { return (R + L) >> 1; }
-	}_mem[MAXN<<1], *ptr, ans[lgN], *buf;
-	SegmentTree(int *arr, int n){
-		ptr = _mem, buf = ans;
-		build(arr, 0, n, ptr++);
+		Node(int _L = 0, int _R = 0){
+			L = _L, R = _R;
+			l = r = NULL;
+		}
+		int len(){ return R - L; }
+		int mid(){ return (R + L) >> 1; }
+	}*rt, buf[lgN<<2], *ptr;
+	int *arr, n;
+	SegmentTree(int *_arr, int _n){
+		arr = _arr, n = _n;
+		ptr = buf;
+		rt = build(0, n);
 	}
-	void build(int *arr, int L, int R, Node *u){
-		u->L = L, u->R = R;
+	~SegmentTree(){
+		remove(rt);
+	}
+	void remove(Node *u){
+		if (!u)  return;
+		remove(u->l), remove(u->r);
+		delete u;
+	}
+	Node* build(int L, int R){
+		Node *u = new Node(L, R);
 		if (u->len() == 1) {
 			// base data
-			return ;
+			return u;
 		}
 		int M = u->mid();
-		build(arr, L, M, u->l = ptr++);
-		build(arr, M, R, u->r = ptr++);
-		pull(u);
+		u->l = build(L, M);
+		u->r = build(M, R);
+		return pull(u);
 	}
-	Node* pull(Node *u, Node *l = NULL, Node *r = NULL){
-		if (!l) l = u->l;
-		if (!r) r = u->r;
-		push(l); push(r);
+	Node* pull(Node *u, bool single = true, Node *l = NULL, Node *r = NULL){
+		if (single) l = u->l, r = u->r;
+		if (!l || !r) return l ? l : r;
+		push(l), push(r);
 		// pull function
 		return u;
 	}
@@ -37,29 +52,26 @@ struct SegmentTree{
 		if (!u) return ;
 		// push function
 	}
-	void modify(int L, int R, int v, Node *u = NULL){
-		if (!u) u = _mem;
-		push(u);
-		if (L <= u->L && u->R <= R){
+	void modify(int mL, int mR, int v, Node *u = NULL){
+		if (!u) u = rt;
+		if (u->R <= mL || mR <= u->L) return ;
+		if (mL <= u->L && u->R <= mR){
 			// tag
-		}else if (L < u->R && u->L < R){
-			int M = u->mid();
-			modify(L, R, v, u->l);
-			modify(L, R, v, u->r);
-			pull(u);
-		}else return ;
-	}
-	Node* query(int L, int R, Node *u = NULL){
-		if (!u) u = _mem, buf = ans;
+			return ;
+		}
 		push(u);
-		if (L <= u->L && u->R <= R) return u;
 		int M = u->mid();
-		if (R <= M) return query(L, R, u->l);
-		else if (L >= M) return query(L, R, u->r);
-		else return pull(buf++, query(L, R, u->l), query(L, R, u->r));
+		modify(mL, mR, v, u->l);
+		modify(mL, mR, v, u->r);
+		pull(u);
 	}
-
+	Node* query(int qL, int qR, Node *u = NULL){
+		if (!u) u = rt, ptr = buf;
+		if (u->R <= qL || qR <= u->L) return (Node*)NULL;
+		if (qL <= u->L && u->R <= qR) return u;
+		push(u);
+		return pull(ptr++, false, query(qL, qR, u->l), query(qL, qR, u->r));
+	}
 };
 int main(){
-
 }
