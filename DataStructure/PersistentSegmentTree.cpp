@@ -54,7 +54,7 @@ struct PersistentSegmentTree{
 	Sptr<Node> build(int L, int R){
 		Sptr<Node> u = _new(Node(L, R));
 		if (u->len() == 1){
-			u->sum = arr[L];
+			// base data
 			return u;
 		}
 		int M = u->mid();
@@ -110,18 +110,5 @@ int main(){
 	cin >> n;
 	for (int i = 0 ; i < n ; i++) cin >> arr[i];
 	Sptr<PersistentSegmentTree> sol = _new(PersistentSegmentTree(arr, n));
-	char op;
-	while (cin >> op){
-		int a, b, v;
-		if (op == 'A'){
-			cin >> a >> b >> v;
-			sol->modify(a, b, v);
-		}
-		if (op == 'Q'){
-			cin >> a >> b >> v;
-			cout << sol->query(a, b, v)->sum << '\n';
-		}
-	}
-	sol->Print();
 }
 
