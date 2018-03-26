@@ -1,76 +1,159 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int MAXN = 5e4 + 5;;
+template <typename T>
+struct _ptrCntr{
+	T v; int cnt;
+	_ptrCntr(const T& _v = 0) : v(_v){
+		cnt = 0;
+	}
+};
+template <typename T>
+struct Sptr{
+	_ptrCntr<T> *p;
+	T* operator->(){ return &p->v; }
+	T& operator*(){ return p->v; }
+	operator _ptrCntr<T>*(){ return p;}
+	Sptr& operator = (const Sptr& t){
+		if (p && !--p->cnt) delete p;
+		(p = t.p) && ++p->cnt;
+		return *this;
+	}
+	Sptr(_ptrCntr<T> *t = NULL) : p(t){
+		p && ++p->cnt;
+	}
+	Sptr(const Sptr &t) : p(t.p){
+		p && ++p->cnt;
+	}
+	~Sptr(){
+		if (p && !--p->cnt) delete p;
+	}
+};
+template <typename T>
+inline Sptr<T> _new(const T& u){
+	return Sptr<T>(new _ptrCntr<T>(u));
+}
+const int MAXN = 1e5 + 5;
 const int lgN = __lg(MAXN) + 5;
 const int MAXK = 100;
-struct SegmentTree{
+struct PersistentSegmentTree{
 	struct Node{
+		Sptr<Node> l, r;
 		int L, R;
-		Node *l, *r;
 		// data
-		Node(int _L = 0, int _R = 0){
+		int sum;
+		// tag
+		int add;
+		Node(int _L, int _R) : l(NULL), r(NULL){
 			L = _L, R = _R;
-			l = r = NULL;
+			sum = add = 0;
 		}
 		int len(){ return R - L; }
 		int mid(){ return (R + L) >> 1; }
-	}*rt[MAXK], buf[lgN<<2], *ptr;
-	int *arr, n;
-	SegmentTree(int *_arr, int _n){
-		arr = _arr, n = _n;
-		ptr = buf;
-		rt[0] = build(0, n);
+		~Node(){
+		}
+	};
+	Sptr<Node> rt[MAXK];
+	int *arr, n, kCnt;
+	PersistentSegmentTree(int *_arr, int _n){
+		arr = _arr, n = _n; kCnt = 0;
+		build(0, n, rt[0]);
 	}
-	~SegmentTree(){
-		remove(rt);
-	}
-	void remove(Node *u){
-		if (!u)  return;
-		remove(u->l), remove(u->r);
-		delete u;
-	}
-	Node* build(int L, int R){
-		Node *u = new Node(L, R);
-		if (u->len() == 1) {
-			// base data
-			return u;
+	void build(int L, int R, Sptr<Node>& u){
+		u = _new(Node(L, R));
+		if (u->len() == 1){
+			u->sum = arr[L];
+			return ;
 		}
 		int M = u->mid();
-		u->l = build(L, M);
-		u->r = build(M, R);
-		return pull(u);
+		build(L, M, u->l);
+		build(M, R, u->r);
+		pull(u);
 	}
-	Node* pull(Node *u, bool single = true, Node *l = NULL, Node *r = NULL){
-		if (single) l = u->l, r = u->r;
+	Sptr<Node> pull(Sptr<Node> &u, Sptr<Node> &l, Sptr<Node> &r){
 		if (!l || !r) return l ? l : r;
 		push(l), push(r);
-		// pull function
+		u->sum = l->sum + r->sum;
 		return u;
 	}
-	void push(Node *u){
+	void push(Sptr<Node> &u){
 		if (!u) return ;
-		// push function
+		if (u->add){
+			u->sum += u->add * u->len();
+			if (u->l) u->l = _new(*(u->l)), u->l->add += u->add;
+			if (u->r) u->r = _new(*(u->r)), u->r->add += u->add;
+			u->add = 0;
+		}
 	}
-	void modify(int mL, int mR, int v, Node *u = NULL){
-		if (!u) u = rt;
+	Sptr<Node> pull(Sptr<Node> &u){
+		return pull(u, u->l, u->r);
+	}
+	Sptr<Node> copy(Sptr<Node> &u){
+		return _new(*u);
+	}
+	void modify(int mL, int mR, int v){
+		modify(mL, mR, v, rt[kCnt], rt[kCnt + 1]);
+		kCnt++;
+	}
+	void modify(int mL, int mR, int v, Sptr<Node> &u, Sptr<Node> &_u){
 		if (u->R <= mL || mR <= u->L) return ;
-		if (mL <= u->L && u->R <= mR){
-			// tag
+		_u = _new(*u);
+		if (mL <= u->L && u->R <= mR) {
+			_u->add += v;
 			return ;
 		}
 		push(u);
 		int M = u->mid();
-		modify(mL, mR, v, u->l);
-		modify(mL, mR, v, u->r);
-		pull(u);
+		modify(mL, mR, v, u->l, _u->l);
+		modify(mL, mR, v, u->r, _u->r);
+		pull(_u);
 	}
-	Node* query(int qL, int qR, Node *u = NULL){
-		if (!u) u = rt, ptr = buf;
-		if (u->R <= qL || qR <= u->L) return (Node*)NULL;
-		if (qL <= u->L && u->R <= qR) return u;
+	void Print(){
+		for (int i = 0 ; i <= kCnt ; i++){
+			cout << "Root " << i << ":\n";
+			Print(rt[i]);
+			cout << "\n\n";
+		}
+	}
+	void Print(Sptr<Node> u){
+		if (!u) return ;
+		cout << u->L << '\t' << u->R << '\t' << u->sum << '\t' << u->add << '\n';
+		Print(u->l);
+		Print(u->r);
+	}
+	Sptr<Node> query(int qL, int qR, int k){
+		return query(qL, qR, rt[k]);
+	}
+	Sptr<Node> query(int qL, int qR, Sptr<Node> &u){
+		if (u->R <= qL || qR <= u->L) return Sptr<Node>(NULL);
+		if (qL <= u->L && u->R <= qR) {
+			return u;
+		}
 		push(u);
-		return pull(ptr++, false, query(qL, qR, u->l), query(qL, qR, u->r));
+		int M = u->mid();
+		Sptr<Node> res = _new(Node(u->L, u->R));
+		Sptr<Node> l = query(qL, qR, u->l);
+		Sptr<Node> r = query(qL, qR, u->r);
+		return pull(res, l, r);
 	}
 };
 int main(){
+	int arr[MAXN], n;
+	cin >> n;
+	for (int i = 0 ; i < n ; i++) cin >> arr[i];
+	Sptr<PersistentSegmentTree> sol = _new(PersistentSegmentTree(arr, n));
+	sol->Print();
+	char op;
+	int a, b, v, k;
+	while (cin >> op){
+		if (op == 'A'){
+			cin >> a >> b >> v;
+			sol->modify(a, b, v);
+		}
+		if (op == 'Q'){
+			cin >> a >> b >> k;
+			cout << sol->query(a, b, k)->sum << '\n';
+		}
+		sol->Print();
+	}
+	
 }
