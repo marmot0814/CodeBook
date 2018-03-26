@@ -46,21 +46,21 @@ struct PersistentSegmentTree{
 	int *arr, n, kCnt;
 	PersistentSegmentTree(int *_arr, int _n){
 		arr = _arr, n = _n; kCnt = 0;
-		build(0, n, rt[0]);
+		rt[0] = build(0, n);
 	}
-	void copy(Sptr<Node> &_u, Sptr<Node> &u){
-		_u = _new(*u);
+	Sptr<Node> copy(Sptr<Node> &u){
+		return _new(*u);
 	}
-	void build(int L, int R, Sptr<Node>& u){
-		u = _new(Node(L, R));
+	Sptr<Node> build(int L, int R){
+		Sptr<Node> u = _new(Node(L, R));
 		if (u->len() == 1){
-			// base data
-			return ;
+			u->sum = arr[L];
+			return u;
 		}
 		int M = u->mid();
-		build(L, M, u->l);
-		build(M, R, u->r);
-		pull(u);
+		u->l = build(L, M);
+		u->r = build(M, R);
+		return pull(u);
 	}
 	Sptr<Node> pull(Sptr<Node> &u, Sptr<Node> &l, Sptr<Node> &r){
 		if (!l || !r) return l ? l : r;
@@ -77,9 +77,9 @@ struct PersistentSegmentTree{
 	}
 	void modify(int mL, int mR, int v, Sptr<Node> &u, Sptr<Node> &_u){
 		if (u->R <= mL || mR <= u->L) return ;
-		copy(_u, u);
+		_u = copy(u);
 		if (mL <= u->L && u->R <= mR) {
-			// tag
+			// tag (on copy node)
 			return ;
 		}
 		push(u);
@@ -90,11 +90,8 @@ struct PersistentSegmentTree{
 	}
 	Sptr<Node> query(int qL, int qR, Sptr<Node> &u){
 		if (u->R <= qL || qR <= u->L) return Sptr<Node>(NULL);
-		if (qL <= u->L && u->R <= qR) {
-			return u;
-		}
-		push(u);
-		int M = u->mid();
+		if (qL <= u->L && u->R <= qR) return u;
+		push(u); int M = u->mid();
 		Sptr<Node> res = _new(Node(u->L, u->R));
 		Sptr<Node> l = query(qL, qR, u->l);
 		Sptr<Node> r = query(qL, qR, u->r);
@@ -113,5 +110,18 @@ int main(){
 	cin >> n;
 	for (int i = 0 ; i < n ; i++) cin >> arr[i];
 	Sptr<PersistentSegmentTree> sol = _new(PersistentSegmentTree(arr, n));
+	char op;
+	while (cin >> op){
+		int a, b, v;
+		if (op == 'A'){
+			cin >> a >> b >> v;
+			sol->modify(a, b, v);
+		}
+		if (op == 'Q'){
+			cin >> a >> b >> v;
+			cout << sol->query(a, b, v)->sum << '\n';
+		}
+	}
+	sol->Print();
 }
 
