@@ -1,11 +1,10 @@
 #include <bits/stdc++.h>
 using namespace std;
+// SmartPointer
 template <typename T>
 struct _ptrCntr{
 	T v; int cnt;
-	_ptrCntr(const T& _v = 0) : v(_v){
-		cnt = 0;
-	}
+	_ptrCntr(const T& _v = 0) : v(_v), cnt(0){}
 };
 template <typename T>
 struct Sptr{
@@ -15,23 +14,17 @@ struct Sptr{
 	operator _ptrCntr<T>*(){ return p;}
 	Sptr& operator = (const Sptr& t){
 		if (p && !--p->cnt) delete p;
-		(p = t.p) && ++p->cnt;
-		return *this;
+		(p = t.p) && ++p->cnt; return *this;
 	}
-	Sptr(_ptrCntr<T> *t = NULL) : p(t){
-		p && ++p->cnt;
-	}
-	Sptr(const Sptr &t) : p(t.p){
-		p && ++p->cnt;
-	}
-	~Sptr(){
-		if (p && !--p->cnt) delete p;
-	}
+	Sptr(_ptrCntr<T> *t = NULL) : p(t){p && ++p->cnt;}
+	Sptr(const Sptr &t) : p(t.p){p && ++p->cnt;}
+	~Sptr(){ if (p && !--p->cnt) delete p;}
 };
 template <typename T>
 inline Sptr<T> _new(const T& u){
 	return Sptr<T>(new _ptrCntr<T>(u));
 }
+// PersistentSegmentTree
 const int MAXN = 1e5 + 5;
 const int lgN = __lg(MAXN) + 5;
 const int MAXK = 100;
@@ -40,23 +33,22 @@ struct PersistentSegmentTree{
 		Sptr<Node> l, r;
 		int L, R;
 		// data
-		int sum;
 		// tag
-		int add;
 		Node(int _L, int _R) : l(NULL), r(NULL){
 			L = _L, R = _R;
-			sum = add = 0;
+			// data tag init
 		}
 		int len(){ return R - L; }
 		int mid(){ return (R + L) >> 1; }
-		~Node(){
-		}
 	};
 	Sptr<Node> rt[MAXK];
 	int *arr, n, kCnt;
 	PersistentSegmentTree(int *_arr, int _n){
 		arr = _arr, n = _n; kCnt = 0;
 		build(0, n, rt[0]);
+	}
+	void copy(Sptr<Node> &_u, Sptr<Node> &u){
+		_u = _new(*u);
 	}
 	void build(int L, int R, Sptr<Node>& u){
 		u = _new(Node(L, R));
@@ -72,23 +64,15 @@ struct PersistentSegmentTree{
 	Sptr<Node> pull(Sptr<Node> &u, Sptr<Node> &l, Sptr<Node> &r){
 		if (!l || !r) return l ? l : r;
 		push(l), push(r);
-		u->sum = l->sum + r->sum;
+		// pull function
 		return u;
 	}
 	void push(Sptr<Node> &u){
 		if (!u) return ;
-		if (u->add){
-			u->sum += u->add * u->len();
-			if (u->l) u->l = _new(*(u->l)), u->l->add += u->add;
-			if (u->r) u->r = _new(*(u->r)), u->r->add += u->add;
-			u->add = 0;
-		}
+		// push function
 	}
 	Sptr<Node> pull(Sptr<Node> &u){
 		return pull(u, u->l, u->r);
-	}
-	Sptr<Node> copy(Sptr<Node> &u){
-		return _new(*u);
 	}
 	void modify(int mL, int mR, int v){
 		modify(mL, mR, v, rt[kCnt], rt[kCnt + 1]);
@@ -96,9 +80,9 @@ struct PersistentSegmentTree{
 	}
 	void modify(int mL, int mR, int v, Sptr<Node> &u, Sptr<Node> &_u){
 		if (u->R <= mL || mR <= u->L) return ;
-		_u = _new(*u);
+		copy(_u, u);
 		if (mL <= u->L && u->R <= mR) {
-			_u->add += v;
+			// tag
 			return ;
 		}
 		push(u);
@@ -106,19 +90,6 @@ struct PersistentSegmentTree{
 		modify(mL, mR, v, u->l, _u->l);
 		modify(mL, mR, v, u->r, _u->r);
 		pull(_u);
-	}
-	void Print(){
-		for (int i = 0 ; i <= kCnt ; i++){
-			cout << "Root " << i << ":\n";
-			Print(rt[i]);
-			cout << "\n\n";
-		}
-	}
-	void Print(Sptr<Node> u){
-		if (!u) return ;
-		cout << u->L << '\t' << u->R << '\t' << u->sum << '\t' << u->add << '\n';
-		Print(u->l);
-		Print(u->r);
 	}
 	Sptr<Node> query(int qL, int qR, int k){
 		return query(qL, qR, rt[k]);
@@ -141,7 +112,6 @@ int main(){
 	cin >> n;
 	for (int i = 0 ; i < n ; i++) cin >> arr[i];
 	Sptr<PersistentSegmentTree> sol = _new(PersistentSegmentTree(arr, n));
-	sol->Print();
 	char op;
 	int a, b, v, k;
 	while (cin >> op){
@@ -153,7 +123,6 @@ int main(){
 			cin >> a >> b >> k;
 			cout << sol->query(a, b, k)->sum << '\n';
 		}
-		sol->Print();
 	}
 	
 }
