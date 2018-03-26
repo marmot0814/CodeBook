@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 using namespace std;
 // SmartPointer
@@ -53,7 +54,7 @@ struct PersistentSegmentTree{
 	void build(int L, int R, Sptr<Node>& u){
 		u = _new(Node(L, R));
 		if (u->len() == 1){
-			u->sum = arr[L];
+			// base data
 			return ;
 		}
 		int M = u->mid();
@@ -74,10 +75,6 @@ struct PersistentSegmentTree{
 	Sptr<Node> pull(Sptr<Node> &u){
 		return pull(u, u->l, u->r);
 	}
-	void modify(int mL, int mR, int v){
-		modify(mL, mR, v, rt[kCnt], rt[kCnt + 1]);
-		kCnt++;
-	}
 	void modify(int mL, int mR, int v, Sptr<Node> &u, Sptr<Node> &_u){
 		if (u->R <= mL || mR <= u->L) return ;
 		copy(_u, u);
@@ -91,9 +88,6 @@ struct PersistentSegmentTree{
 		modify(mL, mR, v, u->r, _u->r);
 		pull(_u);
 	}
-	Sptr<Node> query(int qL, int qR, int k){
-		return query(qL, qR, rt[k]);
-	}
 	Sptr<Node> query(int qL, int qR, Sptr<Node> &u){
 		if (u->R <= qL || qR <= u->L) return Sptr<Node>(NULL);
 		if (qL <= u->L && u->R <= qR) {
@@ -106,23 +100,18 @@ struct PersistentSegmentTree{
 		Sptr<Node> r = query(qL, qR, u->r);
 		return pull(res, l, r);
 	}
+	void modify(int mL, int mR, int v){
+		modify(mL, mR, v, rt[kCnt], rt[kCnt + 1]);
+		kCnt++;
+	}
+	Sptr<Node> query(int qL, int qR, int k){
+		return query(qL, qR, rt[k]);
+	}
 };
 int main(){
 	int arr[MAXN], n;
 	cin >> n;
 	for (int i = 0 ; i < n ; i++) cin >> arr[i];
 	Sptr<PersistentSegmentTree> sol = _new(PersistentSegmentTree(arr, n));
-	char op;
-	int a, b, v, k;
-	while (cin >> op){
-		if (op == 'A'){
-			cin >> a >> b >> v;
-			sol->modify(a, b, v);
-		}
-		if (op == 'Q'){
-			cin >> a >> b >> k;
-			cout << sol->query(a, b, k)->sum << '\n';
-		}
-	}
-	
 }
+
