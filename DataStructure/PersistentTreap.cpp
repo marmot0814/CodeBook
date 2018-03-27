@@ -33,9 +33,9 @@ int d;
 struct PersistentTreap{
 	struct Node{
 		Sptr<Node> l, r;
-		char c; int sz;
-		Node(char _c = 0) : l(NULL), r(NULL){
-			c = _c, sz = 1;
+		int sz;
+		Node() : l(NULL), r(NULL){
+			sz = 1;
 		}
 	};
 	Sptr<Node> ver[MAXK];
@@ -76,64 +76,10 @@ struct PersistentTreap{
 			return MP(tmp.F, pull(res));
 		}
 	}
-	void insert(char *s, int p){
-		verCnt++, ver[verCnt] = ver[verCnt-1];
-		PNN tmp = split(ver[verCnt], p);
-		for (int i = 0 ; s[i] ; i++){
-			Sptr<Node> target = _new(Node(s[i]));
-			tmp.F = merge(tmp.F, target);
-		}
-		ver[verCnt] = merge(tmp.F, tmp.S);
-	}
-	void remove(int p, int c){
-		verCnt++, ver[verCnt] = ver[verCnt-1];
-		PNN tmp_1 = split(ver[verCnt], p-1);
-		PNN tmp_2 = split(tmp_1.S, c);
-		ver[verCnt] = merge(tmp_1.F, tmp_2.S);
-	}
-	void query(int v, int p, int c){
-		PNN tmp_1 = split(ver[v], p-1);
-		PNN tmp_2 = split(tmp_1.S, c);
-		Print(tmp_2.F); cout << '\n';
-	}
-	void Print(){
-		for (int i = 0 ; i <= verCnt ; i++){
-			cout << "Treap " << i << ":\n";
-			Print(ver[i]);
-			cout << "\n\n";
-		}
-	}
-	void Print(Sptr<Node> &u){
-		if (!u) return ;
-		Print(u->l);
-		cout << u->c;
-		if (u->c == 'c') d++;
-		Print(u->r);
-	}
+	/*	create a version  : verCnt++, ver[verCnt] = ver[verCnt - 1]
+	 *	Treap operator
+	 *	Query dont need to merge
+	 */
 };
-const int MAXLEN = 1e6 + 5;
 int main(){
-	srand(time(NULL));
-	d = 0;
-	Sptr<PersistentTreap> sol = _new(PersistentTreap());
-	int n; cin >> n; while (n--){
-		int op; cin >> op;
-		char input[MAXLEN];
-		int v, p, c;
-		switch (op){
-			case 1:
-				cin >> p >> input; p -= d;
-				sol->insert(input, p);
-				break;
-			case 2:
-				cin >> p >> c; p -= d, c -= d;
-				sol->remove(p, c);
-				break;
-			case 3:
-				cin >> v >> p >> c;
-				v -= d, p -= d, c -= d;
-				sol->query(v, p, c);
-				break;
-		}
-	}
 }
