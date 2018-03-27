@@ -8,10 +8,7 @@ using namespace std;
 #define F first
 #define S second
 #define INT_MAX ~(1<<31)
-inline int ran(){
-	static int x=20160425;
-	return (x=0xdefaced*x+1)&INT_MAX;
-}
+const int MAXN = 2e5 + 5;
 struct Treap{
 	struct Node{
 		Node *l, *r;
@@ -26,14 +23,8 @@ struct Treap{
 			v = minV = _v;
 			add = 0; rev = false;
 		}
-	}*rt;
-	Treap(){ rt = NULL; }
-	~Treap(){ clear(rt); }
-	void clear(Node *u){
-		if (!u) return ;
-		clear(u->l); clear(u->r);
-		delete u;
-	}
+	}*rt, _mem[MAXN], *ptr;
+	Treap(){ rt = NULL; ptr = _mem; }
 	inline int size(Node *u){
 		return u ? u->sz : 0;
 	}
@@ -77,7 +68,7 @@ struct Treap{
 	}
 	Node* merge(Node *T1, Node *T2){
 		if (!T1 || !T2) return T1 ? T1 : T2;
-		if (ran() % (size(T1) + size(T1)) < size(T1)){
+		if (rand() % (size(T1) + size(T1)) < size(T1)){
 			T1->r = merge(push(T1)->r, T2);
 			return pull(T1);
 		}else{
@@ -86,7 +77,7 @@ struct Treap{
 		}
 	}
 	void push_back(int v){
-		rt = merge(rt, new Node(v));
+		rt = merge(rt, new (ptr++) Node(v));
 	}
 	void Print(Node *u){
 		if (!u) return ;
@@ -107,7 +98,7 @@ struct Treap{
 	}
 	void insert(int a, int v){
 		PNN tmp = split(rt, a);
-		tmp.F = merge(tmp.F, new Node(v));
+		tmp.F = merge(tmp.F, new (ptr++) Node(v));
 		rt = merge(tmp.F, tmp.S);
 	}
 	void remove(int a){
