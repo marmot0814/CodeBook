@@ -25,7 +25,12 @@ inline Sptr<T> _new(const T& u){
 	return Sptr<T>(new _ptrCntr<T>(u));
 }
 // PersistentTreap
+#define PNN pair<Sptr<Node>, Sptr<Node> >
+#define MP make_pair
+#define F first
+#define S second
 const int MAXK = 100;
+const int MAXN = 1e5;
 struct PersistentTreap{
 	struct Node{
 		Sptr<Node> l, r;
@@ -77,10 +82,6 @@ struct PersistentTreap{
 		pull(res);
 		return res;
 	}
-#define PNN pair<Sptr<Node>, Sptr<Node> >
-#define MP make_pair
-#define F first
-#define S second
 	PNN split(Sptr<Node> &T, int k){
 		if (!T) return MP(Sptr<Node>(NULL), Sptr<Node>(NULL));
 		push(T);
@@ -125,11 +126,8 @@ struct PersistentTreap{
 };
 int main(){
 	Sptr<PersistentTreap> sol = _new(PersistentTreap());
-	sol->insert('V');
-	sol->insert('E');
-	sol->insert('d');
-	sol->insert('4');
-	sol->Print();
-	sol->reverse(2, 4);
+	for (int i = 0 ; i < 10 ; i++)
+		sol->insert(rand()%26 + 'A');
+	sol->reverse(3, 5);
 	sol->Print();
 }
