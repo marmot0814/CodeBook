@@ -75,18 +75,18 @@ struct PersistentSegmentTree{
 	Sptr<Node> pull(Sptr<Node> &u){
 		return pull(u, u->l, u->r);
 	}
-	void modify(int mL, int mR, int v, Sptr<Node> &u, Sptr<Node> &_u){
-		if (u->R <= mL || mR <= u->L) return ;
-		_u = copy(u);
+	Sptr<Node>  modify(int mL, int mR, int v, Sptr<Node> &u){
+		if (u->R <= mL || mR <= u->L) return u;
+		Sptr<Node>_u = copy(u);
 		if (mL <= u->L && u->R <= mR) {
 			// tag (on copy node)
-			return ;
+			return _u;
 		}
 		push(u);
 		int M = u->mid();
-		modify(mL, mR, v, u->l, _u->l);
-		modify(mL, mR, v, u->r, _u->r);
-		pull(_u);
+		_u->l = modify(mL, mR, v, u->l);
+		_u->r = modify(mL, mR, v, u->r);
+		return pull(_u);
 	}
 	Sptr<Node> query(int qL, int qR, Sptr<Node> &u){
 		if (u->R <= qL || qR <= u->L) return Sptr<Node>(NULL);
@@ -98,7 +98,7 @@ struct PersistentSegmentTree{
 		return pull(res, l, r);
 	}
 	void modify(int mL, int mR, int v){
-		modify(mL, mR, v, rt[kCnt], rt[kCnt + 1]);
+		rt[kCnt + 1] = modify(mL, mR, v, rt[kCnt]);
 		kCnt++;
 	}
 	Sptr<Node> query(int qL, int qR, int k){
