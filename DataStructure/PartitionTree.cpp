@@ -1,10 +1,11 @@
 #include <bits/stdc++.h>
 using namespace std;
 const int MAXN = 50005;
+const int lgN = __log(MAXN) + 5;
 struct PT{
     int sorted[MAXN];
-    int tree[(int)log2(MAXN)+5][MAXN];
-    int toleft[(int)log2(MAXN)+5][MAXN];
+    int tree[lgN][MAXN];
+    int toleft[lgN][MAXN];
     int n;
     void build(int l, int r, int dep){
         if (l == r) return ;
@@ -28,7 +29,7 @@ struct PT{
         build(l ,mid, dep+1);
         build(mid+1, r, dep+1);
     }
-    int Query(int L, int R, int l, int r, int dep, int k){
+    int query(int L, int R, int l, int r, int dep, int k){
         if (l == r) return tree[dep][l];
         int mid = (L+R) >> 1;
         int cnt = toleft[dep][r] - toleft[dep][l-1];
@@ -52,7 +53,7 @@ struct PT{
         build(0, n-1, 0);
     }
     int query(int l, int r, int k){
-        return Query(0, n-1, l, r, 0, k);
+        return query(0, n-1, l, r, 0, k);
     }
 }_PT;
 int main(){

@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 const int SIGMA = 26;
+const int MAXLEN = 1e5;
 struct ACAutomaton{
 	struct Node{
 		Node *n[SIGMA], *f;
@@ -10,11 +11,13 @@ struct ACAutomaton{
 			dp = 0; f = NULL;
 		}
 	}*r, *o;
-	ACAutomaton(char **input, int n){
+	ACAutomaton(int n){
 		o = new Node();
 		r = new Node();
-		for (int i = 0 ; i < n ; i++)
-			buildTrie(input[i]);
+		for (int i = 0 ; i < n ; i++){
+			char input[MAXLEN]; cin >> input;
+			buildTrie(input);
+		}
 		buildAC();
 	}
 	~ACAutomaton(){
