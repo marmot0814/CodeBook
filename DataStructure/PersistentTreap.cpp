@@ -34,6 +34,8 @@ struct PersistentTreap{
 	struct Node{
 		Sptr<Node> l, r;
 		int sz;
+		// data
+		// tag
 		Node() : l(NULL), r(NULL){
 			sz = 1;
 		}
@@ -44,8 +46,13 @@ struct PersistentTreap{
 	inline int size(Sptr<Node> &u){
 		return u ? u->sz : 0;
 	}
+	inline void push(Sptr<Node> &u){
+		// push function
+		// copy a new one and modify on it
+	}
 	inline Sptr<Node> pull(Sptr<Node> &u){
 		u->sz = 1 + size(u->l) + size(u->r);
+		// pull function
 		return u;
 	}
 	inline Sptr<Node> copy(Sptr<Node> &u){
@@ -55,9 +62,11 @@ struct PersistentTreap{
 		if (!T1 || !T2) return T1 ? T1 : T2;
 		Sptr<Node> res;
 		if (rand() % (size(T1) + size(T2)) < size(T1)){
+			push(T1);
 			res = copy(T1);
 			res->r = merge(T1->r, T2);
 		}else{
+			push(T2);
 			res = copy(T2);
 			res->l = merge(T1, T2->l);
 		}
@@ -65,6 +74,7 @@ struct PersistentTreap{
 	}
 	PNN split(Sptr<Node> &T, int k){
 		if (!T) return MP(Sptr<Node>(NULL), Sptr<Node>(NULL));
+		push(T);
 		Sptr<Node> res = copy(T);
 		if (size(T->l) < k){
 			PNN tmp = split(T->r, k - 1 - size(T->l));
