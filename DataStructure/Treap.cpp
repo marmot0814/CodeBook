@@ -7,12 +7,12 @@ using namespace std;
 struct Treap{
 	struct Node{
 		Node *l, *r;
-		int sz;
+		int sz, v;
 		// data
 		// tag
-		Node (){
+		Node (int _v) : v(_v){
 			l = r = NULL;
-			sz = 1;
+			sz = 1; 
 		}
 	}*rt;
 	Treap(){ rt = NULL; }
@@ -26,8 +26,7 @@ struct Treap{
 		return u ? u->sz : 0;
 	}
 	inline Node*& pull(Node *&u){
-		push(u->l), push(u->r);
-		u->sz = 1 + size(u->l) + size(u->r);
+		u->sz = 1 + size(push(u->l)) + size(push(u->r));
 		// pull function
 		return u;
 	}
@@ -38,7 +37,7 @@ struct Treap{
 	PNN split(Node *T, int x){
 		if (!T) return MP((Node*)NULL, (Node*)NULL);
 		if (size(push(T)->l) < x){
-			PNN tmp = split(T->l, x - size(T->l) - 1);
+			PNN tmp = split(T->r, x - size(T->l) - 1);
 			T->r = tmp.F;
 			return MP(pull(T), tmp.S);
 		}else{
@@ -50,11 +49,11 @@ struct Treap{
 	Node* merge(Node *T1, Node *T2){
 		if (!T1 || !T2) return T1 ? T1 : T2;
 		if (rand() % (size(T1) + size(T2)) < size(T1)){
-			T2->l = merge(T1, push(T2)->l);
-			return pull(T2);
-		}else{
 			T1->r = merge(push(T1)->r, T2);
 			return pull(T1);
+		}else{
+			T2->l = merge(T1, push(T2)->l);
+			return pull(T2);
 		}
 	}
 	int rank(int v, Node *u){
@@ -63,6 +62,4 @@ struct Treap{
 	}
 };
 int main(){
-	Treap *sol = new Treap();
-	delete sol;
 }
