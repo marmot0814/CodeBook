@@ -1,31 +1,28 @@
 #include <bits/stdc++.h>
+#define MP make_pair
+#define F first
+#define S second
 using namespace std;
 template <typename T>
-struct _ptrCntr{
-	T v; int cnt;
-	_ptrCntr(const T& _v = 0){
-		cnt = 0; v = _v;
-	}
-};
-template <typename T>
 struct Sptr{
-	_ptrCntr<T> *p;
-	T *operator->(){return &p->v;}
-	T &operator*(){return p->v;}
-	operator _ptrCntr<T>*(){return p;}
+	pair<T, int> *p;
+	T *operator->(){return &p->F;}
+	T &operator*(){return p->F;}
+	operator pair<T, int>*(){return p;}
 	Sptr &operator = (const Sptr& t){
-		if (p && !--p->cnt) delete p;
-		(p = t.p) && ++p->cnt;
+		if (p && !--p->S) delete p;
+		(p = t.p) && ++p->S;
 		return *this;
 	}
-	Sptr(_ptrCntr<T> *t = 0){ (p = t) && ++p->cnt;}
-	Sptr(const Sptr &t){ (p = t.p) && ++p->cnt; }
-	~Sptr(){ if (p && !--p->cnt) delete p; }
+	Sptr(pair<T, int> *t = 0) : p(t){ p && ++p->S;}
+	Sptr(const Sptr &t) : p(t.p) { p && ++p->S; }
+	~Sptr(){ if (p && !--p->S) delete p; }
 };
 template <typename T>
-inline Sptr<T> _new (const T& nd){
-	return Sptr<T>(new _ptrCntr<T>(nd));
+inline Sptr<T> _new (const T& n){
+	return Sptr<T>(new pair<T, int>(n, 0));
 }
 int main(){
-
+	Sptr<int> a = _new(4);
+	cout << a << ' ' << *a << '\n';
 }
