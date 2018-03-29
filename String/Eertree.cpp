@@ -21,6 +21,15 @@ struct Eertree{
 		rt->f = last; last->f = last;
 		for (int i = 0 ; input[i] ; i++) add(input[i]);
 	}
+	~Eertree(){
+		clear(rt->f); clear(rt);
+	}
+	void clear(Node *u){
+		if (!u) return ;
+		for (int i = 0 ; i < SIGMA ; i++)
+			clear(u->n[i]);
+		delete u;
+	}
 	inline Node* getFail(Node *u){
 		while (s[n - u->len - 1] != s[n]) u = u->f;
 		return u;
