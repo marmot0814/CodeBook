@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 struct SuffixArray{
-	const int L;
+    const int L;
 };
 int main(){
 

@@ -40,7 +40,7 @@ inline bool isPrime(T n, int *sprp, int num){
 }
 
 int main(){
-	for (int i = 1 ; i < 100 ; i++)
-		if (isPrime(i, llsprp, 7))
-			cout << i << '\n';
+    for (int i = 1 ; i < 100 ; i++)
+        if (isPrime(i, llsprp, 7))
+            cout << i << '\n';
 }
