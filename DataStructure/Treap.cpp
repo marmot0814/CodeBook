@@ -31,6 +31,7 @@ struct Treap{
         return u;
     }
     inline Node*& push(Node *&u){
+        if (!u) return u;
         // push function
         return u;
     }
