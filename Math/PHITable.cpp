@@ -1,14 +1,10 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int MAXP = 100;
-int main(){
-    int PHI[MAXP + 2];
-    for (int i = 1 ; i <= MAXP ; i++) PHI[i] = i;
-    for (int i = 2 ; i <= MAXP ; i += 2) PHI[i] /= 2;
-    for (int i = 3 ; i <= MAXP ; i += 2)
-        if (PHI[i] == i)
-            for (int j = i ; j <= MAXP ; j += i)
-                PHI[j] = PHI[j] / i * (i - 1);
-    for (int i = 1 ; i <= MAXP ; i++)
-        cout << PHI[i] << (i == MAXP ? '\n' : ' ');
+const int MAXN = 1000;
+long long int PHI[MAXN + 1];
+void PHITable(){
+    for (int i = 1 ; i <= MAXN ; i++) PHI[i] = i;
+    for (int i = 1 ; i <= MAXN ; i++) 
+        for (int j = i * 2 ; j <= MAXN ; j += i)
+            PHI[j] -= PHI[i];
 }

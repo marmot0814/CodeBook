@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 const double EPS = 1e-8;
+const double PI = acos(-1.0);
 template <typename T>
 inline char cmp(const T& a, const T& b){
     if (abs(a - b) < EPS) return 0;
@@ -26,24 +27,32 @@ struct Point{
     bool operator == (const Point &b)const{
         return !cmp(x, x.b) && !cmp(y, y.b);
     }
-    T dot(const Point& b)const {
+    T operator * (const Point &b)const{
         return x * b.x + y * b.y;
     }
-    T cross(const Point& b)const{
+    T operator ^ (const Point &b)const{
         return x * b.y - y * b.x;
     }
     Point normal()const{
         return Point(-y, x);
     }
     Point len()const{
-        return dot * (*this);
+        return (*this) * (*this);
     }
     T rad(const Point& b)const{
         return fabs(atan2(fabs(cross(b)), dot(b)));
     }
     T getA(){
-
+        T A = atan2(y, x);
+        if (A <= -PI/2) A += PI * 2;
+        return A;
+    }
+    friend ostream& operator << (ostream& out, const Point& p){
+        out << "(" << p.x << "," << p.y << ")\n";
+        return out;
     }
 };
 int main(){
+    Point<int> a(1, 3), b(5, 8);
+    cout << a * b << '\n';
 }
