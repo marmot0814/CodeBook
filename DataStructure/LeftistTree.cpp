@@ -5,25 +5,23 @@ struct LeftistTree{
         int v, d;
         Node *l, *r;
         Node(int _v = 0) : v(_v), d(1), l(NULL), r(NULL){}
-        inline int deep(){ return this ? d : 0; }
-        inline void pull(){
-            if (l->deep() < r->deep()) swap(l, r);
-            d = 1 + r->deep();
-        }
     }*rt;
     int sz;
+    inline int deep(Node *u){ return u ? u->d : 0; }
+    inline Node*& pull(Node *&u){
+        if (deep(u->l) < deep(u->r)) swap(u->l, u->r);
+        u->d = 1 + deep(u->r);
+    }
     LeftistTree(){ sz = 0; rt = NULL; }
     ~LeftistTree(){ remove(rt); }
     Node* merge(Node *L1, Node *L2){
         if (!L1 || !L2) return L1 ? L1 : L2;
         if (L1->v < L2->v){
             L1->r = merge(L1->r, L2);
-            L1->pull();
-            return L1;
+            return pull(L1);
         }else{
             L2->r = merge(L2->r, L1);
-            L2->pull();
-            return L2;
+            return pull(L2);
         }
     }
     void push(int v){
