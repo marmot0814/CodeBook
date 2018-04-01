@@ -11,6 +11,7 @@ struct LeftistTree{
     inline Node*& pull(Node *&u){
         if (deep(u->l) < deep(u->r)) swap(u->l, u->r);
         u->d = 1 + deep(u->r);
+        return u;
     }
     LeftistTree(){ sz = 0; rt = NULL; }
     ~LeftistTree(){ remove(rt); }
