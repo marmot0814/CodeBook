@@ -69,6 +69,13 @@ double PolygonArea(Point *p, int n){
         area += (p[i] - p[0]) ^ (p[i+1] - p[0]);
     return fabs(area) / 2.0;
 }
+struct Circle{
+    Point c; double r;
+    Circle(const Point& c, double r) : c(c), r(r){}
+    Point point(double a){
+        return Point(c.x + cos(a) * r, c.y + sin(a) * r);
+    }
+};
 int main(){
     Point p[4];
     p[0] = Point(-3, 5);
