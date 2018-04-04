@@ -30,16 +30,6 @@ pLL CRT(LL *A, LL *B, LL *M, int n){
     x = (x % m + m) % m;
     return pLL(x, m);
 }
-const int MAXN = 1e6 + 5;
-LL A[MAXN], B[MAXN], M[MAXN];
 int main(){
-    LL n; while (cin >> n){
-        for (int i = 0 ; i < n ; i++) {
-            cin >> M[i] >> B[i];
-            A[i] = 1;
-        }
-        pLL res = CRT(A, B, M, n);
-        if (res.second == -1) cout << -1 << '\n';
-        else cout << res.first << '\n';
-    }
+
 }
