@@ -96,6 +96,8 @@ int main(){
         pLL ans = sol->maxFlowMinCost();
         if (ans.F == n) cout << ans.S << '\n';
         else cout << -1 << '\n';
+        delete G;
+        delete sol;
     }
 }
 

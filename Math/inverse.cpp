@@ -1,22 +1,18 @@
 #include <bits/stdc++.h>
 using namespace std;
-int extgcd(int a, int b, int &x, int &y){
-    int d = a;
+typedef long long LL;
+LL extgcd(LL a, LL b, LL &x, LL &y){
+    LL d = a;
     if (b != 0){
         d = extgcd(b, a % b, y, x);
         y -= (a / b) * x;
     }else x = 1, y = 0;
     return d;
 }
-int modInv(int a, int m){
-    int x, y;
-    extgcd(a, m, x, y);
-    return m + (x % m) % m;
+LL modInv(LL a, LL m){
+    LL x, y, d = extgcd(a, m, x, y);
+    return d == 1 ? (m + x % m) % m : -1;
 }
-int mod = 616069;
 int main(){
-    for (int i = 0 ; i < 100 ; i++){
-        int r = modInv(i, mod);
-        cout << r << ' ' << (r * i) % mod << '\n';
-    }
+
 }
