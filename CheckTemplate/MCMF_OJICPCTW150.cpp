@@ -71,5 +71,31 @@ struct MCMF{
     }
 };
 int main(){
-
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    int t;
+    cin >> t;
+    while (t--){
+        int n, m;
+        cin >> n >> m;
+        Graph *G = new Graph(n + m + 2);
+        for (int i = 1 ; i <= n ; i++){
+            G->addEdge(0, i, 1, 0);
+            for (int j = 1 ; j <= m ; j++){
+                LL tmp;
+                cin >> tmp;
+                if (tmp) G->addEdge(i, j+n, 1, tmp);
+            }
+        }
+        for (int i = 1 ; i <= m ; i++){
+            LL tmp;
+            cin >> tmp;
+            G->addEdge(n+i, n+m+1, tmp, 0);
+        }
+        MCMF *sol = new MCMF(G, 0, n + m + 1);
+        pLL ans = sol->maxFlowMinCost();
+        if (ans.F == n) cout << ans.S << '\n';
+        else cout << -1 << '\n';
+    }
 }
+
