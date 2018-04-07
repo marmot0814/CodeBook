@@ -14,24 +14,17 @@ struct Graph{
         }
     }_memN[MAXN], *node[MAXN];
     struct Edge{
-        Node *t;
-        Edge(Node *_t = NULL) : t(_t){}
+        Node *v;
+        Edge(Node *v = NULL) : v(v){}
     }_memE[MAXM], *ptrE;
     Graph(int _V = 0) : V(_V){
-        ptrE = _memE;
         for (int i = 0 ; i < V ; i++)
             *(node[i] = _memN + i) = Node();
+        ptrE = _memE;
     }
     void addEdge(int u, int v){
         node[u]->PB(new (ptrE++) Edge(node[v]));
         node[v]->PB(new (ptrE++) Edge(node[u]));
-    }
-    void Print(){
-    for (int i = 0 ; i < V ; i++){
-        if (!node[i]->m) continue;
-        if (node[i]->m - node[0] >= i)
-            cout << i + 1 << ' ' << node[i]->m - node[0] + 1 << '\n';
-        }
     }
 };
 struct Blossom{
@@ -56,7 +49,7 @@ struct Blossom{
         while (q.size()){
             u = q.front(), q.pop();
             for (auto e : *u){
-                Node *v = e->t;
+                Node *v = e->v;
                 if (!~v->S){
                     v->p = u;
                     v->S = 1;
