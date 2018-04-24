@@ -39,8 +39,9 @@ struct Graph {
         queue<Node*> q; q.push(u), u->S = 0;
         while (q.size()) {
             u = q.front(); q.pop();
-            for (auto e : *u) {
-                Node *v = e->v;
+            for (vector<Graph::Edge*>::iterator it = u->begin() ; it != u->end() ; it++){
+            //for (auto e : *u) {
+                Node *v = (*it)->v;
                 if (!~v->S) {
                     v->p = u; v->S = 1;
                     if (!v->m) return augment(u, v);
@@ -90,6 +91,14 @@ struct Graph {
         }
     }
 };
-int main() {
-
+int main() { ios_base::sync_with_stdio(false); cin.tie(0);
+    freopen("WorkScheduling.in", "r", stdin);
+    freopen("WorkScheduling.out", "w", stdout);
+    int n; cin >> n;
+    Graph *G = new Graph(n);
+    int u, v; while (cin >> u >> v) G->addEdge(u - 1, v - 1);
+    cout << G->maxMatch() * 2 << '\n';
+    G->Print();
+    delete G;
 }
+
