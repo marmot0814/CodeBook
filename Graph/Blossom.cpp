@@ -82,13 +82,6 @@ struct Graph {
             u = v->p;
         }
     }
-    void Print() {
-        for (int i = 0 ; i < V ; i++) {
-            if (!node[i]->m) continue;
-            if (node[i]->m - _memN >= i)
-                cout << i + 1 << ' ' << node[i]->m - _memN + 1 << '\n';
-        }
-    }
 };
 int main() {
 
