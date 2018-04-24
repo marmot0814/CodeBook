@@ -19,9 +19,9 @@ struct Graph{
         Edge(){}
         Edge(Node *u, Node *v, LL c, Edge *rev) : u(u), v(v), c(c), f(0), rev(rev){}
     }_memE[MAXM], *ptrE;
-    Graph(int _V){
-        for (int i = 0 ; i < (V = _V) ; i++)
-            *(node[i] = _memN + i) = Node();
+    Graph(int _V) : V(_V) {
+        for (int i = 0 ; i < V ; i++)
+            node[i] = _memN + i;
         ptrE = _memE;
     }
     void addEdge(int _u, int _v, LL _c){
@@ -30,26 +30,27 @@ struct Graph{
         *ptrE = Edge(node[_v], node[_u], _c, ptrE - 1);
         node[_v]->PB(ptrE++);
     }
-};
-typedef Graph::Node Node;
-#define qpush(s, n) q.push(s), s->d = n
-#define qpop() q.front(); q.pop()
-struct Dinic{
-    Graph *G;
-    Node **node, *s, *t;
-    Dinic(Graph *_G, int _s, int _t){
-        G = _G, node = &G->node[0];
+    
+    Node *s, *t;
+    LL maxFlow(int _s, int _t){
         s = node[_s], t = node[_t];
+        LL flow = 0;
+        while (bfs()) {
+            for (int i = 0 ; i < V ; i++)
+                node[i]->cur = node[i]->begin();
+            flow += dfs(s, INF);
+        }
+        return flow;
     }
     bool bfs(){
-        for (int i = 0 ; i < G->V ; i++) node[i]->d = -1;
-        queue<Node*> q; qpush(s, 0);
-        while (q.size()){
-            Node *u = qpop();
-            for (auto e : *u){
+        for (int i = 0 ; i < V ; i++) node[i]->d = -1;
+        queue<Node*> q; q.push(s); s->d = 0;
+        while (q.size()) {
+            Node *u = q.front(); q.pop();
+            for (auto e : *u) {
                 Node *v = e->v;
                 if (!~v->d && e->c > e->f)
-                    qpush(v, u->d + 1);
+                    q.push(v), v->d = u->d + 1;
             }
         }
         return ~t->d;
@@ -57,9 +58,9 @@ struct Dinic{
     LL dfs(Node *u, LL a){
         if (u == t || !a) return a;
         LL flow = 0, f;
-        for (; u->cur != u->end() ; u->cur++){
+        for (; u->cur != u->end() ; u->cur++) {
             auto &e = *u->cur; Node *v = e->v;
-            if (u->d + 1 == v->d && (f = dfs(v, min(a, e->c - e->f))) > 0){
+            if (u->d + 1 == v->d && (f = dfs(v, min(a, e->c - e->f))) > 0) {
                 e->f += f; e->rev->f -= f;
                 flow += f; a -= f;
                 if (!a) break;
@@ -67,28 +68,17 @@ struct Dinic{
         }
         return flow;
     }
-    LL maxFlow(){
-        LL flow = 0;
-        while (bfs()){
-            for (int i = 0 ; i < G->V ; i++)
-                node[i]->cur = node[i]->begin();
-            flow += dfs(s, INF);
-        }
-        return flow;
-    }
 };
-int main(){
-    ios_base::sync_with_stdio(false);
-    cin.tie(0); int kase = 0;
-    int n; while (cin >> n && n){
+int main(){ ios_base::sync_with_stdio(false); cin.tie(0);
+    int kase = 0, n; while (cin >> n && n) {
         cout << "Network " << ++kase << '\n';
         Graph *G = new Graph(n);
         int s, t, m; cin >> s >> t >> m;
-        while (m--){
-            int u, v; LL c; cin >> u >> v >> c;
+        while (m--) {
+            int u, v; LL c;
+            cin >> u >> v >> c;
             G->addEdge(u - 1, v - 1, c);
         }
-        Dinic *sol = new Dinic(G, s - 1, t - 1);
-        cout << "The bandwidth is " << sol->maxFlow() << ".\n\n";
+        cout << "The bandwidth is " << G->maxFlow(s - 1, t - 1) << ".\n\n";
     }
 }
