@@ -24,18 +24,19 @@ struct Graph{
     }
     
     int stamp, scc_num; stack<Node*> stk;
-    void findSCC(){
+    int findSCC(){
         stamp = scc_num = 0;
         for (auto u : node)
             if (!~u->dfn)
-                tarjan(u);
+                Tarjan(u);
+        return scc_num;
     }
-    void tarjan(Node *u) {
+    void Tarjan(Node *u) {
         u->dfn = u->low = stamp++;
         stk.push(u); u->in_stk = true;
         for (auto to : *u){
             if (!~to->dfn) {
-                tarjan(to);
+                Tarjan(to);
                 u->low = min(u->low, to->low);
             }else if (to->in_stk)
                 u->low = min(u->low, to->dfn);
