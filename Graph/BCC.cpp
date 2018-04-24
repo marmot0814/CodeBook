@@ -7,7 +7,7 @@ using namespace std;
 const int MAXN = 1e3 + 5;
 struct Graph { 
     int V;
-    struct Node : vector<Node*> {
+    struct Node : vector<Node*> {   // if it is a cut, then bcc is not true;
         int dfn, low, bcc;
         bool is_cut;
         Node () { clear(); dfn = low = bcc = -1; is_cut = false; }
