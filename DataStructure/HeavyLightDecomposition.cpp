@@ -63,7 +63,7 @@ struct Tree{
             if (uTop->dep < vTop->dep) 
                 swap(u, v), swap(uTop, vTop);
             // query [uTop->id, u->id + 1)
-            uTop = (u = uTop->pa)-top;
+            uTop = (u = uTop->pa)->top;
         }
         // if (u != v) query[u->id + 1, v->id + 1)
         return u->dep < v->dep ? u : v; // LCA
