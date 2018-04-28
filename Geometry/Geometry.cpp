@@ -54,19 +54,19 @@ struct Point{
     }
 };
 struct Line {
-    Line(){}
     Point p1, p2;
     double a, b, c;
-    Line(const Point &_p1, const Point &_p2) : p1(_p1), p2(_p2) {}
-    void pton() {
+    Line(){};
+    Line(const Point &_p1, const Point &_p2) : p1(_p1), p2(_p2) {
         a = p1.y - p2.y;
         b = p2.x - p1.x;
-        c = - a * p1.x - b * p1.y;
+        c = -a * p1.x - b * p1.y;
     }
-    double operator % (const Point &p) const {
+    double operator % (const Point &p) const { // >0 left, <0 right, =0 on the line
         return (p2 - p1) % (p - p1);
     }
-    bool point_on_segment(const Point &p) const {
+    
+    bool on_segment(const Point &p) const {
         return !dcmp(*this % p) && dcmp((p1 - p) * (p2 - p)) <= 0;
     }
     double dis2(const Point &p, bool is_segment = false) const {
