@@ -1,77 +1,82 @@
 #include <bits/stdc++.h>
 using namespace std;
-const int MAXN = 5e4 + 5;;
+typedef long long LL;
+const int MAXN = 1e4 + 5;
 const int lgN = __lg(MAXN) + 5;
-const int MAXK = 100;
-struct SegmentTree{
-    struct Node{
-        int L, R;
+struct SegmentTree {
+    struct Node {
+        int L, R; 
         Node *l, *r;
         // data
         // tag
-        Node(int _L = 0, int _R = 0){
-            L = _L, R = _R;
+        Node (int _L = 0,int _R = 0) : L(_L), R(_R) {
             l = r = NULL;
         }
-        int len(){ return R - L; }
-        int mid(){ return (R + L) >> 1; }
-    }*rt, buf[lgN<<2], *ptr;
-    int *arr, n;
-    SegmentTree(int *_arr, int _n){
+    }*rt, buf[lgN << 2], *ptr;
+    LL *arr; int n;
+    SegmentTree(LL *_arr, int _n) {
         arr = _arr, n = _n;
-        ptr = buf;
         rt = build(0, n);
     }
-    ~SegmentTree(){
+
+    ~SegmentTree() {
         remove(rt);
     }
-    void remove(Node *u){
-        if (!u)  return;
-        remove(u->l), remove(u->r);
+    void remove(Node *u) {
+        if (!u) return ;
+        remove(u->r);
+        remove(u->l);
         delete u;
     }
-    Node* build(int L, int R){
+    Node* build(int L, int R) {
         Node *u = new Node(L, R);
-        if (u->len() == 1) {
-            // base data
+        if (R - L == 1) {
+            // basic data
             return u;
         }
-        int M = u->mid();
+        int M = (R + L) >> 1;
         u->l = build(L, M);
         u->r = build(M, R);
         return pull(u);
     }
-    Node* pull(Node *u, bool single = true, Node *l = NULL, Node *r = NULL){
-        if (single) l = u->l, r = u->r;
+    Node* pull(Node *u) {
+        return pull(u, u->l, u->r);
+    }
+    Node* pull(Node *u, Node *l, Node *r) {
         if (!l || !r) return l ? l : r;
-        push(l), push(r);
-        // pull function
+        push(l); push(r);
+        // pull function;
         return u;
     }
-    void push(Node *u){
+    void push(Node *u) {
         if (!u) return ;
         // push function
     }
-    void modify(int mL, int mR, int v, Node *u = NULL){
-        if (!u) u = rt;
-        if (u->R <= mL || mR <= u->L) return ;
-        if (mL <= u->L && u->R <= mR){
-            // tag
-            return ;
-        }
-        push(u);
-        int M = u->mid();
-        modify(mL, mR, v, u->l);
-        modify(mL, mR, v, u->r);
-        pull(u);
+    Node* query(int qL, int qR) {
+        ptr = buf;
+        return query(qL, qR, rt);
     }
-    Node* query(int qL, int qR, Node *u = NULL){
-        if (!u) u = rt, ptr = buf;
+    Node* query(int qL, int qR, Node *u) {
         if (u->R <= qL || qR <= u->L) return (Node*)NULL;
         if (qL <= u->L && u->R <= qR) return u;
         push(u);
-        return pull(ptr++, false, query(qL, qR, u->l), query(qL, qR, u->r));
+        return pull(ptr++, query(qL, qR, u->l), query(qL, qR, u->r));
+    }
+    void modify(int mL, int mR) {
+        return modify(mL, mR, rt);
+    }
+    void modify(int mL, int mR, Node *u) {
+        if (u->R <= mL || mR <= u->L) return ;
+        if (mL <= u->L && u->R <= mR) {
+            // modify function
+            return ;
+        }
+        push(u);
+        modify(mL, mR, u->l);
+        modify(mL, mR, u->r);
+        pull(u);
     }
 };
-int main(){
+int main() {
+
 }
