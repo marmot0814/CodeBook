@@ -27,7 +27,7 @@ struct Graph{
     void addEdge(int _u, int _v, LL _c){
         *ptrE = Edge(node[_u], node[_v], _c, ptrE + 1);
         node[_u]->PB(ptrE++);
-        *ptrE = Edge(node[_v], node[_u], _c, ptrE - 1);
+        *ptrE = Edge(node[_v], node[_u], _c, ptrE - 1); //  有向: 0, 無向: _c
         node[_v]->PB(ptrE++);
     }
     
